@@ -1,6 +1,6 @@
 # Problem 1: Greedy Algorithm (Dijkstra's Shortest Path)
 
-Place your .java source files here. Suggested filename: problem1_dijkstra.java
+Place your .py source files here. Suggested filename: problem1_dijkstra.py
 
 ## What goes here
 - Main program file
