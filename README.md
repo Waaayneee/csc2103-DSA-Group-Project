@@ -17,8 +17,6 @@ Smart Delivery Route Optimization System (Option A). A delivery company needs to
 | Stewart | Problem 3 (Heuristic) |
 | Wayne | GitHub, Integration & Report Coordinator |
 
-Update this table with actual names before submission.
-
 **3. Folder Structure**
 
 csc2103-group-project/
