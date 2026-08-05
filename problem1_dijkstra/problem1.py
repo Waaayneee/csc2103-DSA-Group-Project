@@ -2,50 +2,11 @@
 CSC2103 Group Project - Problem 1: Greedy Algorithm
 Topic: Smart Delivery Route Optimization System (Option A)
 Algorithm: Dijkstra's Shortest Path Algorithm
-
-Scenario:
-A delivery company needs to find the shortest road route from the depot
-to a chosen delivery destination, using a weighted graph of road
-distances between city locations.
-
-Why Greedy fits this problem:
-At every step, Dijkstra's algorithm picks the unvisited location with
-the smallest known tentative distance from the depot, and locks that
-distance in as final. This "always pick the locally best option" choice
-is the greedy strategy: it never revisits or changes a decision once a
-node is finalized, because with non-negative edge weights, no shorter
-path to that node can ever be found later.
-
-Implementation note:
-This program does NOT use any built-in graph or shortest-path library.
-The core Dijkstra logic (finding the minimum tentative distance among
-unvisited nodes, and relaxing edges) is written manually below using
-plain dictionaries and lists, so every step of the greedy choice is
-visible and explained.
 """
 
 import copy
 
-
-# ---------------------------------------------------------------------------
-# Graph representation
-# ---------------------------------------------------------------------------
-# The graph is stored as an adjacency dictionary:
-#   graph = {
-#       "Depot": {"WarehouseA": 4, "WarehouseB": 8},
-#       "WarehouseA": {"Depot": 4, "CityCenter": 3},
-#       ...
-#   }
-# Roads are treated as two-way (bidirectional), which is typical for a
-# city road network.
-
-
 def build_sample_graph():
-    """
-    Returns a preloaded sample delivery network so the group can quickly
-    demonstrate and test the program without typing input every time.
-    This represents a small city with a depot and five delivery zones.
-    """
     graph = {
         "Depot": {},
         "WarehouseA": {},
@@ -71,11 +32,6 @@ def build_sample_graph():
 
 
 def build_disconnected_sample_graph():
-    """
-    Returns a sample graph containing a node that is NOT reachable from
-    the depot at all. This is used as an edge case test to confirm the
-    program correctly reports when no path exists, instead of crashing.
-    """
     graph = {
         "Depot": {"WarehouseA": 5},
         "WarehouseA": {"Depot": 5},
@@ -85,13 +41,6 @@ def build_disconnected_sample_graph():
 
 
 def read_custom_graph():
-    """
-    Prompts the user to manually build a delivery network by entering
-    locations and roads (edges) one at a time. Includes input validation:
-    - rejects non-numeric distances
-    - rejects negative distances, since Dijkstra's algorithm requires
-      non-negative edge weights to guarantee a correct greedy choice
-    """
     graph = {}
 
     num_locations = get_positive_int("Enter the number of delivery locations (including the depot): ")
@@ -143,26 +92,9 @@ def get_positive_int(prompt):
         except ValueError:
             print("    Please enter a valid whole number.")
 
-
-# ---------------------------------------------------------------------------
 # Manual Dijkstra's Shortest Path Algorithm
-# ---------------------------------------------------------------------------
 
 def dijkstra_shortest_path(graph, source, show_steps=True):
-    """
-    Manually computes the shortest distance from 'source' to every other
-    node in 'graph' using Dijkstra's greedy algorithm.
-
-    Returns:
-        distances - dict of shortest distance from source to each node
-        previous  - dict used to reconstruct the shortest path later
-
-    The greedy choice at each step:
-        Among all locations not yet finalized, pick the one with the
-        smallest known tentative distance, and finalize it. This choice
-        is never revisited, which is what makes this a greedy algorithm
-        rather than one that explores all possibilities.
-    """
     # Step 0: initialize distances as infinity, except the source itself.
     distances = {node: float("inf") for node in graph}
     distances[source] = 0
@@ -172,9 +104,7 @@ def dijkstra_shortest_path(graph, source, show_steps=True):
     step_number = 1
 
     while len(visited) < len(graph):
-        # --- Greedy choice: find the unvisited node with the smallest ---
-        # --- known tentative distance. This is done manually with a  ---
-        # --- simple scan, no built-in priority queue or heap library. ---
+        # Greedy choice: select the unvisited node with the smallest tentative distance.
         current_node = None
         current_distance = float("inf")
         for node in graph:
@@ -188,7 +118,7 @@ def dijkstra_shortest_path(graph, source, show_steps=True):
 
         visited.add(current_node)
 
-        # --- Relax edges: update tentative distances of neighbors ---
+        #relax edges: update distances to neighbors if a shorter path is found through current_node.
         for neighbor, weight in graph[current_node].items():
             if neighbor in visited:
                 continue
@@ -224,10 +154,7 @@ def reconstruct_path(previous, source, destination):
         return None
     return path
 
-
-# ---------------------------------------------------------------------------
 # Output formatting
-# ---------------------------------------------------------------------------
 
 def print_step_table(step_number, current_node, distances, visited):
     """
@@ -259,10 +186,7 @@ def print_final_result(source, destination, distances, previous):
     print(f"Total distance: {distances[destination]}")
     print("=" * 50)
 
-
-# ---------------------------------------------------------------------------
 # Main program / menu
-# ---------------------------------------------------------------------------
 
 def choose_source_and_destination(graph):
     print("\nAvailable locations:", ", ".join(graph.keys()))
