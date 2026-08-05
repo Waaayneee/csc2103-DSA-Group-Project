@@ -62,20 +62,19 @@ def read_custom_graph():
 
     for i in range(num_edges):
         while True:
-            raw = input(f"  Road {i + 1}: ").strip().split()
-            if len(raw) != 3:
-                print("    Please enter exactly 3 values: FromLocation ToLocation Distance.")
+            raw = input(f"  Road {i + 1}: ").strip()
+            if not raw:
+                print("    Please enter a valid road in the format: FromLocation ToLocation Distance.")
                 continue
-            a, b, w_str = raw
-            a_key = find_graph_key(graph, a)
-            b_key = find_graph_key(graph, b)
+
+            parsed_edge = parse_custom_edge(raw, graph)
+            if parsed_edge is None:
+                print("    Please enter a valid road in the format: FromLocation ToLocation Distance.")
+                continue
+
+            a_key, b_key, w = parsed_edge
             if a_key is None or b_key is None:
                 print("    One of those locations was not registered above. Try again.")
-                continue
-            try:
-                w = float(w_str)
-            except ValueError:
-                print("    Distance must be a number. Try again.")
                 continue
             if w < 0:
                 print("    Distance cannot be negative (Dijkstra's algorithm requires non-negative weights). Try again.")
@@ -85,6 +84,29 @@ def read_custom_graph():
             break
 
     return graph
+
+
+def parse_custom_edge(raw, graph):
+    """Parse a road entry where location names may contain spaces."""
+    parts = raw.split()
+    if len(parts) < 3:
+        return None
+
+    try:
+        w = float(parts[-1])
+    except ValueError:
+        return None
+
+    remaining_tokens = parts[:-1]
+    for split_index in range(1, len(remaining_tokens)):
+        left = " ".join(remaining_tokens[:split_index]).strip()
+        right = " ".join(remaining_tokens[split_index:]).strip()
+        a_key = find_graph_key(graph, left)
+        b_key = find_graph_key(graph, right)
+        if a_key is not None and b_key is not None:
+            return a_key, b_key, w
+
+    return None, None, w
 
 
 def normalize_location_name(name):
