@@ -47,7 +47,13 @@ def read_custom_graph():
     print("\nEnter the name of each location (e.g. Depot, WarehouseA, CityCenter):")
     for i in range(num_locations):
         name = input(f"  Location {i + 1} name: ").strip()
-        if name not in graph:
+        if not name:
+            print("    Location name cannot be empty. Try again.")
+            i -= 1
+            continue
+
+        existing_key = find_graph_key(graph, name)
+        if existing_key is None:
             graph[name] = {}
 
     num_edges = get_positive_int("\nEnter the number of roads (edges) connecting these locations: ")
@@ -61,7 +67,9 @@ def read_custom_graph():
                 print("    Please enter exactly 3 values: FromLocation ToLocation Distance.")
                 continue
             a, b, w_str = raw
-            if a not in graph or b not in graph:
+            a_key = find_graph_key(graph, a)
+            b_key = find_graph_key(graph, b)
+            if a_key is None or b_key is None:
                 print("    One of those locations was not registered above. Try again.")
                 continue
             try:
@@ -72,11 +80,25 @@ def read_custom_graph():
             if w < 0:
                 print("    Distance cannot be negative (Dijkstra's algorithm requires non-negative weights). Try again.")
                 continue
-            graph[a][b] = w
-            graph[b][a] = w
+            graph[a_key][b_key] = w
+            graph[b_key][a_key] = w
             break
 
     return graph
+
+
+def normalize_location_name(name):
+    """Convert names to a comparable form so spacing and capitalization do not matter."""
+    return "".join(name.split()).casefold()
+
+
+def find_graph_key(graph, name):
+    """Return the exact graph key that matches the user's input name, ignoring case and spaces."""
+    target = normalize_location_name(name)
+    for graph_key in graph:
+        if normalize_location_name(graph_key) == target:
+            return graph_key
+    return None
 
 
 def get_positive_int(prompt):
@@ -135,11 +157,6 @@ def dijkstra_shortest_path(graph, source, show_steps=True):
 
 
 def reconstruct_path(previous, source, destination):
-    """
-    Walks backwards through the 'previous' map built during Dijkstra's
-    algorithm to reconstruct the actual shortest path from source to
-    destination, then reverses it into the correct order.
-    """
     if previous.get(destination) is None and destination != source:
         return None  # no path exists
 
@@ -157,10 +174,6 @@ def reconstruct_path(previous, source, destination):
 # Output formatting
 
 def print_step_table(step_number, current_node, distances, visited):
-    """
-    Prints a table showing the state of the algorithm after this step,
-    so the greedy choice made at each stage is clearly visible.
-    """
     print(f"\n--- Step {step_number}: Finalized '{current_node}' ---")
     print(f"{'Location':<15}{'Tentative Distance':<20}{'Finalized?':<10}")
     print("-" * 45)
@@ -191,16 +204,18 @@ def print_final_result(source, destination, distances, previous):
 def choose_source_and_destination(graph):
     print("\nAvailable locations:", ", ".join(graph.keys()))
     while True:
-        source = input("Enter the DEPOT / starting location: ").strip()
-        if source in graph:
+        source = input("Enter the starting location, IE 'Depot': ").strip()
+        source_key = find_graph_key(graph, source)
+        if source_key is not None:
             break
         print("  That location does not exist in the network. Try again.")
     while True:
-        destination = input("Enter the DESTINATION location: ").strip()
-        if destination in graph:
+        destination = input("Enter the DESTINATION location, IE 'Mall': ").strip()
+        destination_key = find_graph_key(graph, destination)
+        if destination_key is not None:
             break
         print("  That location does not exist in the network. Try again.")
-    return source, destination
+    return source_key, destination_key
 
 
 def run_case(graph, label):
