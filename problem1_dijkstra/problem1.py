@@ -338,7 +338,7 @@ def print_final_result(graph, source, destination, distances, previous, expected
 def choose_source_and_destination(graph):
     print("\nAvailable locations:", ", ".join(graph.keys()))
     while True:
-        source = input("Enter the starting location, IE 'Depot': ").strip()
+        source = input("Enter the STARTING location, IE 'Depot': ").strip()
         source_key = find_graph_key(graph, source)
         if source_key is not None:
             break
