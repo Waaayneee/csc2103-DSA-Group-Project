@@ -45,12 +45,12 @@ Shortest route from 'Depot' to 'Mall':
 Total distance: 12
 ==================================================
 
-**File Structure**
+**4. File Structure**
 problem1_dijkstra/
 ├── problem1_dijkstra.py   # Main program (all logic in one file)
 └── README.md              # This file
 
-**Known Limitations:**
+**5. Known Limitations:**
 1. Requires non-negative edge weights; the program validates and rejects negative distances during custom
 2. input, since Dijkstra's algorithm does not guarantee correct results with negative weights.
 3. Assumes roads are bidirectional (two-way), matching a typical city road network.
