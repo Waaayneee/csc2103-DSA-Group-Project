@@ -330,7 +330,7 @@ def print_final_result(graph, source, destination, distances, previous, expected
     if expectedShortestDistances is not None:
         expectedDistance = expectedShortestDistances.get(source, {}).get(destination)
         if expectedDistance is not None:
-            # Show whether the computed shortest distance matches the answer sheet.
+            # Show whether the Dijkstra algo shortest distance matches the answer sheet.
             print_shortest_distance_check_result(source, destination, shortestDistance, expectedDistance)
     print("=" * 50)
 
