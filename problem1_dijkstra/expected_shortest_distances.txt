@@ -1,6 +1,5 @@
 #These calculations were done by Wayne and Natalie on pen and paper :>
 
-
 #Format:
 # Source Destination Distance
 
