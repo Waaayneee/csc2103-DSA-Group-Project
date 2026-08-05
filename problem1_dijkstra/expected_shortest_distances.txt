@@ -1,0 +1,42 @@
+#These calculations were done by Wayne and Natalie on pen and paper :>
+
+
+#Format:
+# Source Destination Distance
+
+Depot	Depot	0
+Depot	WarehouseA	4
+Depot	WarehouseB	8
+Depot	CityCenter	7
+Depot	Suburb	11
+Depot	Mall	12
+WarehouseA	Depot	4
+WarehouseA	WarehouseA	0
+WarehouseA	WarehouseB	5
+WarehouseA	CityCenter	3
+WarehouseA	Suburb	7
+WarehouseA	Mall	8
+WarehouseB	Depot	8
+WarehouseB	WarehouseA	5
+WarehouseB	WarehouseB	0
+WarehouseB	CityCenter	2
+WarehouseB	Suburb	6
+WarehouseB	Mall	7
+CityCenter	Depot	7
+CityCenter	WarehouseA	3
+CityCenter	WarehouseB	2
+CityCenter	CityCenter	0
+CityCenter	Suburb	4
+CityCenter	Mall	5
+Suburb	Depot	11
+Suburb	WarehouseA	7
+Suburb	WarehouseB	6
+Suburb	CityCenter	4
+Suburb	Suburb	0
+Suburb	Mall	6
+Mall	Depot	12
+Mall	WarehouseA	8
+Mall	WarehouseB	7
+Mall	CityCenter	5
+Mall	Suburb	6
+Mall	Mall	0
