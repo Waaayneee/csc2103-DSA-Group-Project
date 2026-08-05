@@ -40,20 +40,27 @@ On launch, you'll see a menu:
 3.4 The program runs Dijkstra's algorithm, printing a step-by-step table showing which location is finalized at each stage, then prints the final shortest path and several distance comparisons for the selected route.
 
 **3. Sample Result:**
-
-==================================================
+--------------------------------------------------
 FINAL RESULT
-==================================================
+--------------------------------------------------
 Shortest route from 'Depot' to 'Mall':
+ 
   Depot -> WarehouseA -> CityCenter -> Mall
+  
 Total distance: 12 KM
+
 Average distance: 14.5 KM
+
 Distance saved: 2.5 KM
-==================================================
+
+--------------------------------------------------
 
 **4. File Structure**
+
 problem1_dijkstra/
+
 ├── problem1.py   # Main program (all logic in one file)
+
 └── README.md     # This file
 
 **5. Known Limitations:**
