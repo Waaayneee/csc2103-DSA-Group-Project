@@ -43,27 +43,27 @@ Python 3. No external libraries required, all algorithms are implemented manuall
 
 Run this --> python3 problem1_dijkstra/problem1.py
 
-Finds the shortest road route between two delivery locations. See problem1_dijkstra/README.md for the full step-by-step usage guide.
+Finds the shortest road route between two delivery locations, with a built-in sample network, a disconnected-network edge case test, and a custom network input mode. See problem1_dijkstra/README.md for the full step-by-step usage guide.
 
 **5.2 Problem 2, Dynamic Programming (0/1 Knapsack):**
 
 Run this --> python3 problem2_knapsack/problem2.py
 
-Decides which packages to load onto the truck to maximize delivery priority without exceeding its weight capacity. Enter each package's ID, weight, and priority when prompted, followed by the truck's maximum capacity.
+Decides which packages to load onto the truck to maximize total delivery priority without exceeding its weight capacity. Enter each package's ID, weight, and priority when prompted, followed by the truck's maximum capacity. See problem2_knapsack/README.md for the full step-by-step usage guide.
 
 **5.3 Problem 3, Heuristic (TSP):**
 
-Not yet implemented. This will find an efficient order to visit all delivery stops in one trip.
+Not yet implemented. This will find an efficient order to visit all delivery stops in one trip. See problem3_tsp/README.md for updates once available.
 
 **6. Testing and Validation**
 
 **6.1 Problem 1:**
 
-problem1_dijkstra/expected_shortest_distances.txt contains every source-to-destination distance for the sample network, manually calculated by hand ahead of time. This serves as the answer sheet used to verify the program's output is correct.
+problem1_dijkstra/expected_shortest_distances.txt contains every source-to-destination distance for the sample network, manually calculated by hand ahead of time. This serves as the answer sheet used to verify the program's output is correct, alongside interactive tests covering a typical case, source-to-itself, a disconnected edge case, and custom input validation.
 
 **6.2 Problem 2:**
 
-Test with a small number of packages first to manually verify the DP table and selected packages by hand, then test with a larger set and a tight capacity to confirm the algorithm still picks the optimal combination.
+Test with a small number of packages first to manually verify the DP table and selected packages by hand, then test with a larger set and a tight capacity to confirm the algorithm still picks the optimal combination. Edge cases worth testing include a capacity of 0 and a single package heavier than the truck's capacity.
 
 **6.3 Problem 3:**
 
@@ -72,7 +72,7 @@ To be added once implemented.
 **9. Known Limitations**
 
 1. Problem 1 requires non-negative edge weights and assumes roads are bidirectional (two-way).
-2. Problem 2 assumes all package weights and capacities are whole numbers (integers).
+2. Problem 2 assumes all package weights, priorities, and truck capacity are whole numbers (integers), and does not yet validate against negative values.
 3. Problem 3 is not yet implemented.
 4. Output is text-based only, no GUI, as required by the assignment brief.
 
