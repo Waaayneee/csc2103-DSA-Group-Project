@@ -1,6 +1,6 @@
 """
 CSC2103 Group Project - Problem 1: Greedy Algorithm
-Topic: Smart Delivery Route Optimization System (Option A)
+Topic: Smart Delivery Route Optimization System
 Algorithm: Dijkstra's Shortest Path Algorithm
 """
 
