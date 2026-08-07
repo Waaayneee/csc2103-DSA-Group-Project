@@ -60,49 +60,39 @@ On launch, you'll see a menu:
 --------------------------------------------------
 
 Generation 0: 60 random routes created. Fittest 5:
-
+------------------------------------------------------------------
 Route (delivery order)                          Distance   Fitness
-
+------------------------------------------------------------------
 WarehouseB Mall Suburb CityCenter WarehouseA        32.0    0.0312
-
 WarehouseA CityCenter Mall Suburb WarehouseB        32.0    0.0312
-
 CityCenter WarehouseB Suburb Mall WarehouseA        33.0    0.0303
+------------------------------------------------------------------
+Fitness = 1 / distance, so a shorter route scores higher.
 
 Evolution progress
-
+------------------------------------------------------------------
 Generation     Best in Gen       Average     Best Ever
-
+------------------------------------------------------------------
 0                     32.0          38.3          32.0
-
 20                    32.0          33.4          32.0
-
 40                    32.0          33.3          32.0
-
 --------------------------------------------------
 
 FINAL DELIVERY ROUTE (Genetic Algorithm)
 
 --------------------------------------------------
 
-Delivery order:
-
-  Depot -> WarehouseB -> Mall -> Suburb -> CityCenter -> WarehouseA -> Depot
+Delivery order: Depot -> WarehouseB -> Mall -> Suburb -> CityCenter -> WarehouseA -> Depot
 
 Leg   From          To                km   Roads driven
-
+------------------------------------------------------------------
 1     Depot         WarehouseB         8   Depot > WarehouseB
-
 2     WarehouseB    Mall               7   WarehouseB > CityCenter > Mall
-
 3     Mall          Suburb             6   Mall > Suburb
-
 4     Suburb        CityCenter         4   Suburb > CityCenter
-
 5     CityCenter    WarehouseA         3   CityCenter > WarehouseA
-
 6     WarehouseA    Depot              4   WarehouseA > Depot
-
+------------------------------------------------------------------
 Total distance: 32 KM
 
 Nearest Neighbour (greedy baseline): 33 KM
