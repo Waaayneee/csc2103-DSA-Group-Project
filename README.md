@@ -57,7 +57,6 @@ Decides which packages to load onto the truck to maximize total delivery priorit
 
 **5.3 Problem 3, Heuristic (TSP via Genetic Algorithm):**
 
-Not yet implemented. This will find an efficient order to visit all delivery stops in one trip. See problem3_tsp/README.md for updates once available.
 Run this --> python3 problem3_tsp/problem3_tsp_genetic.py
 
 Finds an efficient order to visit all delivery stops in one trip and return to the depot. A population of candidate routes is evolved over many generations using fitness scoring, tournament selection, order crossover, and mutation. It reuses the same road network and the same Dijkstra logic as Problem 1 to work out the real road distance between each pair of stops. See problem3_tsp/README.md for the full step-by-step usage guide.
