@@ -2,50 +2,13 @@
 CSC2103 Group Project - Problem 1: Greedy Algorithm
 Topic: Smart Delivery Route Optimization System (Option A)
 Algorithm: Dijkstra's Shortest Path Algorithm
-
-Scenario:
-A delivery company needs to find the shortest road route from the depot
-to a chosen delivery destination, using a weighted graph of road
-distances between city locations.
-
-Why Greedy fits this problem:
-At every step, Dijkstra's algorithm picks the unvisited location with
-the smallest known tentative distance from the depot, and locks that
-distance in as final. This "always pick the locally best option" choice
-is the greedy strategy: it never revisits or changes a decision once a
-node is finalized, because with non-negative edge weights, no shorter
-path to that node can ever be found later.
-
-Implementation note:
-This program does NOT use any built-in graph or shortest-path library.
-The core Dijkstra logic (finding the minimum tentative distance among
-unvisited nodes, and relaxing edges) is written manually below using
-plain dictionaries and lists, so every step of the greedy choice is
-visible and explained.
 """
 
 import copy
+from pathlib import Path
 
-
-# ---------------------------------------------------------------------------
-# Graph representation
-# ---------------------------------------------------------------------------
-# The graph is stored as an adjacency dictionary:
-#   graph = {
-#       "Depot": {"WarehouseA": 4, "WarehouseB": 8},
-#       "WarehouseA": {"Depot": 4, "CityCenter": 3},
-#       ...
-#   }
-# Roads are treated as two-way (bidirectional), which is typical for a
-# city road network.
-
-
+# Build the built-in connected sample delivery network.
 def build_sample_graph():
-    """
-    Returns a preloaded sample delivery network so the group can quickly
-    demonstrate and test the program without typing input every time.
-    This represents a small city with a depot and five delivery zones.
-    """
     graph = {
         "Depot": {},
         "WarehouseA": {},
@@ -70,35 +33,31 @@ def build_sample_graph():
     return graph
 
 
+# Build the built-in network with one disconnected location.
 def build_disconnected_sample_graph():
-    """
-    Returns a sample graph containing a node that is NOT reachable from
-    the depot at all. This is used as an edge case test to confirm the
-    program correctly reports when no path exists, instead of crashing.
-    """
     graph = {
         "Depot": {"WarehouseA": 5},
         "WarehouseA": {"Depot": 5},
-        "IsolatedZone": {},  # no roads connect to this location
+        "IsolatedZone": {},  # This is the ONE disconnected location, no roads connect to this location
     }
     return graph
 
 
+# Read a custom graph from user input.
 def read_custom_graph():
-    """
-    Prompts the user to manually build a delivery network by entering
-    locations and roads (edges) one at a time. Includes input validation:
-    - rejects non-numeric distances
-    - rejects negative distances, since Dijkstra's algorithm requires
-      non-negative edge weights to guarantee a correct greedy choice
-    """
     graph = {}
 
     num_locations = get_positive_int("Enter the number of delivery locations (including the depot): ")
     print("\nEnter the name of each location (e.g. Depot, WarehouseA, CityCenter):")
     for i in range(num_locations):
         name = input(f"  Location {i + 1} name: ").strip()
-        if name not in graph:
+        if not name:
+            print("    Location name cannot be empty. Try again.")
+            i -= 1
+            continue
+
+        existing_key = find_graph_key(graph, name)
+        if existing_key is None:
             graph[name] = {}
 
     num_edges = get_positive_int("\nEnter the number of roads (edges) connecting these locations: ")
@@ -107,29 +66,71 @@ def read_custom_graph():
 
     for i in range(num_edges):
         while True:
-            raw = input(f"  Road {i + 1}: ").strip().split()
-            if len(raw) != 3:
-                print("    Please enter exactly 3 values: FromLocation ToLocation Distance.")
+            raw = input(f"  Road {i + 1}: ").strip()
+            if not raw:
+                print("    Please enter a valid road in the format: FromLocation ToLocation Distance.")
                 continue
-            a, b, w_str = raw
-            if a not in graph or b not in graph:
+
+            parsed_edge = parse_custom_edge(raw, graph)
+            if parsed_edge is None:
+                print("    Please enter a valid road in the format: FromLocation ToLocation Distance.")
+                continue
+
+            a_key, b_key, w = parsed_edge
+            if a_key is None or b_key is None:
                 print("    One of those locations was not registered above. Try again.")
-                continue
-            try:
-                w = float(w_str)
-            except ValueError:
-                print("    Distance must be a number. Try again.")
                 continue
             if w < 0:
                 print("    Distance cannot be negative (Dijkstra's algorithm requires non-negative weights). Try again.")
                 continue
-            graph[a][b] = w
-            graph[b][a] = w
+            graph[a_key][b_key] = w
+            graph[b_key][a_key] = w
             break
 
     return graph
 
 
+# Parse one custom road entry (edge) into two locations and a distance.
+def parse_custom_edge(raw, graph):
+    """Parse a road entry where location names may contain spaces."""
+    parts = raw.split()
+    if len(parts) < 3:
+        return None
+
+    try:
+        w = float(parts[-1])
+    except ValueError:
+        return None
+
+    remaining_tokens = parts[:-1]
+    for split_index in range(1, len(remaining_tokens)):
+        left = " ".join(remaining_tokens[:split_index]).strip()
+        right = " ".join(remaining_tokens[split_index:]).strip()
+        a_key = find_graph_key(graph, left)
+        b_key = find_graph_key(graph, right)
+        if a_key is not None and b_key is not None:
+            return a_key, b_key, w
+
+    return None, None, w
+
+
+# Normalize a location name for case-insensitive matching.
+def normalize_location_name(name):
+    """Convert names to a comparable form so spacing and capitalization do not matter."""
+    return "".join(name.split()).casefold()
+
+
+# Find the exact graph key that matches a user-entered location name.
+def find_graph_key(graph, name):
+    """Return the exact graph key that matches the user's input name, ignoring case and spaces."""
+    target = normalize_location_name(name)
+    for graph_key in graph:
+        if normalize_location_name(graph_key) == target:
+            return graph_key
+    return None
+
+
+# Keep asking until the user enters a positive whole number.
 def get_positive_int(prompt):
     """Repeatedly asks for input until a positive integer is given."""
     while True:
@@ -144,26 +145,48 @@ def get_positive_int(prompt):
             print("    Please enter a valid whole number.")
 
 
-# ---------------------------------------------------------------------------
-# Manual Dijkstra's Shortest Path Algorithm
-# ---------------------------------------------------------------------------
+# Load the expected shortest distances answer sheet from disk.
+def load_expected_shortest_distances():
+    expectedShortestDistances = {}
+    answerSheetPath = Path(__file__).with_name("expected_shortest_distances.txt")
 
+    with answerSheetPath.open("r", encoding="utf-8") as answerSheetFile:
+        for rawLine in answerSheetFile:
+            line = rawLine.strip()
+            if not line or line.startswith("#"):
+                continue
+
+            source, destination, distanceText = line.split("\t")
+            distanceValue = float(distanceText)
+            if distanceValue.is_integer():
+                distanceValue = int(distanceValue)
+            expectedShortestDistances.setdefault(source, {})[destination] = distanceValue
+
+    return expectedShortestDistances
+
+
+# Print whether the computed shortest distance matches the answer sheet.
+def print_shortest_distance_check_result(source, destination, actualDistance, expectedDistance):
+    if actualDistance == expectedDistance:
+        print(f"Answer sheet check for '{source}' -> '{destination}': RIGHT")
+    else:
+        print(
+            f"Answer sheet check for '{source}' -> '{destination}': WRONG "
+            f"(expected {format_distance(expectedDistance)}KM, got {format_distance(actualDistance)}KM)"
+        )
+
+
+# Check one computed shortest distance against the answer sheet.
+def verify_shortest_distance(expectedShortestDistances, source, destination, actualDistance):
+    expectedDistance = expectedShortestDistances.get(source, {}).get(destination)
+    if expectedDistance is None:
+        return
+    # Compare the Dijkstra result with the answer sheet entry for this route.
+    assert actualDistance == expectedDistance
+
+# Run Dijkstra's algorithm and record shortest distances and predecessors.
 def dijkstra_shortest_path(graph, source, show_steps=True):
-    """
-    Manually computes the shortest distance from 'source' to every other
-    node in 'graph' using Dijkstra's greedy algorithm.
-
-    Returns:
-        distances - dict of shortest distance from source to each node
-        previous  - dict used to reconstruct the shortest path later
-
-    The greedy choice at each step:
-        Among all locations not yet finalized, pick the one with the
-        smallest known tentative distance, and finalize it. This choice
-        is never revisited, which is what makes this a greedy algorithm
-        rather than one that explores all possibilities.
-    """
-    # Step 0: initialize distances as infinity, except the source itself.
+    # initialize distances as infinity, except the source itself.
     distances = {node: float("inf") for node in graph}
     distances[source] = 0
     previous = {node: None for node in graph}
@@ -172,9 +195,7 @@ def dijkstra_shortest_path(graph, source, show_steps=True):
     step_number = 1
 
     while len(visited) < len(graph):
-        # --- Greedy choice: find the unvisited node with the smallest ---
-        # --- known tentative distance. This is done manually with a  ---
-        # --- simple scan, no built-in priority queue or heap library. ---
+        # Greedy choice: select the unvisited node with the smallest tentative distance.
         current_node = None
         current_distance = float("inf")
         for node in graph:
@@ -188,7 +209,7 @@ def dijkstra_shortest_path(graph, source, show_steps=True):
 
         visited.add(current_node)
 
-        # --- Relax edges: update tentative distances of neighbors ---
+        # relax edges: update distances to neighbors if a shorter path is found through current_node.
         for neighbor, weight in graph[current_node].items():
             if neighbor in visited:
                 continue
@@ -204,12 +225,8 @@ def dijkstra_shortest_path(graph, source, show_steps=True):
     return distances, previous
 
 
+# Rebuild the shortest path from the predecessor map.
 def reconstruct_path(previous, source, destination):
-    """
-    Walks backwards through the 'previous' map built during Dijkstra's
-    algorithm to reconstruct the actual shortest path from source to
-    destination, then reverses it into the correct order.
-    """
     if previous.get(destination) is None and destination != source:
         return None  # no path exists
 
@@ -225,15 +242,58 @@ def reconstruct_path(previous, source, destination):
     return path
 
 
-# ---------------------------------------------------------------------------
-# Output formatting
-# ---------------------------------------------------------------------------
+# Calculate the total distance for a specific path.
+def calculate_path_distance(graph, path):
+    total_distance = 0
+    for index in range(len(path) - 1):
+        total_distance += graph[path[index]][path[index + 1]]
+    return total_distance
 
+
+# Find every simple path between the selected source and destination, for average distance calculation.
+def find_all_simple_paths(graph, source, destination):
+    allPaths = []
+
+    # Visit neighbors recursively while avoiding repeated locations.
+    def depthFirstSearch(currentNode, visited, currentPath):
+        if currentNode == destination:
+            allPaths.append(list(currentPath))
+            return
+
+        for neighbor in graph[currentNode]:
+            if neighbor in visited:
+                continue
+            visited.add(neighbor)
+            currentPath.append(neighbor)
+            depthFirstSearch(neighbor, visited, currentPath)
+            currentPath.pop()
+            visited.remove(neighbor)
+
+    depthFirstSearch(source, {source}, [source])
+    return allPaths
+
+
+# Compute the average distance across all simple routes between two points.
+def calculate_average_route_distance(graph, source, destination):
+    allPaths = find_all_simple_paths(graph, source, destination)
+    if not allPaths:
+        return None
+
+    totalDistance = 0
+    for path in allPaths:
+        totalDistance += calculate_path_distance(graph, path)
+
+    return totalDistance / len(allPaths)
+
+
+# Format a distance value so the output stays readable. (2 decimal places)
+def format_distance(distance):
+    if distance == int(distance):
+        return str(int(distance))
+    return f"{distance:.2f}".rstrip("0").rstrip(".")
+
+# Print the step-by-step Dijkstra table for the current run.
 def print_step_table(step_number, current_node, distances, visited):
-    """
-    Prints a table showing the state of the algorithm after this step,
-    so the greedy choice made at each stage is clearly visible.
-    """
     print(f"\n--- Step {step_number}: Finalized '{current_node}' ---")
     print(f"{'Location':<15}{'Tentative Distance':<20}{'Finalized?':<10}")
     print("-" * 45)
@@ -243,7 +303,8 @@ def print_step_table(step_number, current_node, distances, visited):
         print(f"{node:<15}{str(dist_display):<20}{finalized:<10}")
 
 
-def print_final_result(source, destination, distances, previous):
+# Print the final route summary and distance results.
+def print_final_result(graph, source, destination, distances, previous, expectedShortestDistances=None):
     print("\n" + "=" * 50)
     print("FINAL RESULT")
     print("=" * 50)
@@ -255,37 +316,51 @@ def print_final_result(source, destination, distances, previous):
 
     path = reconstruct_path(previous, source, destination)
     print(f"Shortest route from '{source}' to '{destination}':")
-    print("  " + " -> ".join(path))
-    print(f"Total distance: {distances[destination]}")
+    print(" -> ".join(path))
+    shortestDistance = distances[destination]
+    # Checking if the Dijkstra shortest distance is correct against the answer sheet.
+    if expectedShortestDistances is not None:
+        verify_shortest_distance(expectedShortestDistances, source, destination, shortestDistance)
+    averageDistance = calculate_average_route_distance(graph, source, destination)
+    distanceSaved = averageDistance - shortestDistance
+
+    print(f"Total distance: {format_distance(shortestDistance)} KM")
+    print(f"Average distance: {format_distance(averageDistance)} KM")
+    print(f"Distance saved: {format_distance(distanceSaved)} KM")
+    if expectedShortestDistances is not None:
+        expectedDistance = expectedShortestDistances.get(source, {}).get(destination)
+        if expectedDistance is not None:
+            # Show whether the Dijkstra algo shortest distance matches the answer sheet.
+            print_shortest_distance_check_result(source, destination, shortestDistance, expectedDistance)
     print("=" * 50)
 
-
-# ---------------------------------------------------------------------------
-# Main program / menu
-# ---------------------------------------------------------------------------
-
+# Ask the user to choose a valid start and end location.
 def choose_source_and_destination(graph):
     print("\nAvailable locations:", ", ".join(graph.keys()))
     while True:
-        source = input("Enter the DEPOT / starting location: ").strip()
-        if source in graph:
+        source = input("Enter the STARTING location, IE 'Depot': ").strip()
+        source_key = find_graph_key(graph, source)
+        if source_key is not None:
             break
         print("  That location does not exist in the network. Try again.")
     while True:
-        destination = input("Enter the DESTINATION location: ").strip()
-        if destination in graph:
+        destination = input("Enter the DESTINATION location, IE 'Mall': ").strip()
+        destination_key = find_graph_key(graph, destination)
+        if destination_key is not None:
             break
         print("  That location does not exist in the network. Try again.")
-    return source, destination
+    return source_key, destination_key
 
 
-def run_case(graph, label):
+# Run one selected network and print the result.
+def run_case(graph, label, expectedShortestDistances=None):
     print(f"\n{'#' * 60}\nRunning: {label}\n{'#' * 60}")
     source, destination = choose_source_and_destination(graph)
     distances, previous = dijkstra_shortest_path(graph, source)
-    print_final_result(source, destination, distances, previous)
+    print_final_result(graph, source, destination, distances, previous, expectedShortestDistances)
 
 
+# Show the program menu and handle user choices.
 def main():
     print("=" * 60)
     print(" CSC2103 Problem 1: Greedy Algorithm")
@@ -293,6 +368,7 @@ def main():
     print(" Algorithm: Dijkstra's Shortest Path")
     print("=" * 60)
 
+    expectedShortestDistances = load_expected_shortest_distances()
     while True:
         print("\nMenu:")
         print("  1. Run built-in sample delivery network")
@@ -303,7 +379,7 @@ def main():
 
         if choice == "1":
             graph = build_sample_graph()
-            run_case(graph, "Sample Delivery Network")
+            run_case(graph, "Sample Delivery Network", expectedShortestDistances)
         elif choice == "2":
             graph = build_disconnected_sample_graph()
             run_case(graph, "Disconnected Network (Edge Case)")
