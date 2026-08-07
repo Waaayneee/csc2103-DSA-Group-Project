@@ -35,8 +35,6 @@ csc2103-group-project/
 
 ├── problem3_tsp/          # Problem 3: Heuristic Algorithm (TSP via Genetic Algorithm)
 
-├── shared/                # Reserved for common code reused across problems
-
 ├── docs/                  # Report drafts, sample run screenshots, test case notes
 
 └── README.md              # This file
