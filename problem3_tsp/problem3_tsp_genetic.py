@@ -1,6 +1,5 @@
 """
-CSC2103 Group Project - Problem 3: Heuristic Algorithm
-Topic: Smart Delivery Route Optimization System (Option A)
+CSC2103 Group Project - Problem 3: Heuristic Algorithm for the Travelling Salesman Problem (TSP)
 Algorithm: Travelling Salesman Problem (TSP) using a Genetic Algorithm (GA)
 
 Scenario
