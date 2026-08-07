@@ -1,0 +1,703 @@
+==========================================================================
+ SAMPLE RUNS - problem3_tsp_genetic.py
+ (console input is not echoed; the input typed is listed above each run)
+==========================================================================
+
+### TEST CASE 1 - Typical: sample delivery network (same graph as Problem 1)
+### Input: 1 / Depot / ALL / 6
+--------------------------------------------------------------------------
+==================================================================
+ CSC2103 Problem 3: Heuristic Algorithm
+ Smart Delivery Route Optimization System
+ Travelling Salesman Problem using a Genetic Algorithm
+==================================================================
+
+Menu:
+  1. Run built-in sample delivery network
+  2. Run extended delivery network (larger search space)
+  3. Run built-in DISCONNECTED network (edge case test)
+  4. Enter a custom delivery network
+  5. Run sample network with your own GA settings
+  6. Exit
+Select an option (1-6): 
+==================================================================
+ Sample Delivery Network
+==================================================================
+
+Available locations:
+  1. Depot
+  2. WarehouseA
+  3. WarehouseB
+  4. CityCenter
+  5. Suburb
+  6. Mall
+
+Enter the DEPOT (starting location): 
+Enter delivery stops separated by spaces, or ALL for every location.
+Delivery stops: 
+Shortest road distance between locations (km, from Dijkstra):
+------------------------------------------------------------------------
+                 Depot Warehouse Warehouse CityCente    Suburb      Mall
+Depot                0         4         8         7        11        12
+WarehouseA           4         0         5         3         7         8
+WarehouseB           8         5         0         2         6         7
+CityCenter           7         3         2         0         4         5
+Suburb              11         7         6         4         0         6
+Mall                12         8         7         5         6         0
+------------------------------------------------------------------------
+
+Delivery stops  : 5
+Possible tours  : 12 distinct orders
+GA settings     : population=60, generations=200, mutation=0.3, seed=2103
+
+Generation 0: 60 random routes created. Fittest 5:
+------------------------------------------------------------------
+Route (delivery order)                          Distance   Fitness
+------------------------------------------------------------------
+WarehouseB Mall Suburb CityCenter WarehouseA        32.0    0.0312
+WarehouseA CityCenter Mall Suburb WarehouseB        32.0    0.0312
+WarehouseA CityCenter Suburb Mall WarehouseB        32.0    0.0312
+WarehouseA Suburb Mall CityCenter WarehouseB        32.0    0.0312
+CityCenter WarehouseB Suburb Mall WarehouseA        33.0    0.0303
+------------------------------------------------------------------
+Fitness = 1 / distance, so a shorter route scores higher.
+
+Evolution progress
+------------------------------------------------------------------
+Generation     Best in Gen       Average     Best Ever
+------------------------------------------------------------------
+0                     32.0          38.3          32.0
+20                    32.0          33.4          32.0
+40                    32.0          33.3          32.0
+  (Converged: no improvement for 50 generations, stopped at generation 50.)
+
+BASELINE ROUTE (Nearest Neighbour, greedy)
+------------------------------------------------------------------
+Delivery order : Depot -> WarehouseA -> CityCenter -> WarehouseB -> Suburb -> Mall -> Depot
+
+Leg   From          To                km   Roads driven
+------------------------------------------------------------------
+1     Depot         WarehouseA         4   Depot > WarehouseA
+2     WarehouseA    CityCenter         3   WarehouseA > CityCenter
+3     CityCenter    WarehouseB         2   CityCenter > WarehouseB
+4     WarehouseB    Suburb             6   WarehouseB > CityCenter > Suburb
+5     Suburb        Mall               6   Suburb > Mall
+6     Mall          Depot             12   Mall > CityCenter > WarehouseA > Depot
+------------------------------------------------------------------
+TOTAL DISTANCE : 33 km
+
+FINAL DELIVERY ROUTE (Genetic Algorithm)
+------------------------------------------------------------------
+Delivery order : Depot -> WarehouseB -> Mall -> Suburb -> CityCenter -> WarehouseA -> Depot
+
+Leg   From          To                km   Roads driven
+------------------------------------------------------------------
+1     Depot         WarehouseB         8   Depot > WarehouseB
+2     WarehouseB    Mall               7   WarehouseB > CityCenter > Mall
+3     Mall          Suburb             6   Mall > Suburb
+4     Suburb        CityCenter         4   Suburb > CityCenter
+5     CityCenter    WarehouseA         3   CityCenter > WarehouseA
+6     WarehouseA    Depot              4   WarehouseA > Depot
+------------------------------------------------------------------
+TOTAL DISTANCE : 32 km
+
+Solution quality comparison
+------------------------------------------------------------------
+Method                                  Distance    Routes checked
+------------------------------------------------------------------
+Nearest Neighbour (greedy)                  33.0                 1
+Genetic Algorithm (heuristic)               32.0              3060
+Brute force (true optimal)                  32.0                24
+------------------------------------------------------------------
+The GA route is 3.0% shorter than the greedy baseline.
+Verification   : the GA found the TRUE OPTIMAL tour.
+
+Generations completed : 50
+
+Menu:
+  1. Run built-in sample delivery network
+  2. Run extended delivery network (larger search space)
+  3. Run built-in DISCONNECTED network (edge case test)
+  4. Enter a custom delivery network
+  5. Run sample network with your own GA settings
+  6. Exit
+Select an option (1-6): Exiting program.
+
+### TEST CASE 2 - Larger search space: extended network, 9 stops
+### Input: 2 / Depot / ALL / 6
+--------------------------------------------------------------------------
+==================================================================
+ CSC2103 Problem 3: Heuristic Algorithm
+ Smart Delivery Route Optimization System
+ Travelling Salesman Problem using a Genetic Algorithm
+==================================================================
+
+Menu:
+  1. Run built-in sample delivery network
+  2. Run extended delivery network (larger search space)
+  3. Run built-in DISCONNECTED network (edge case test)
+  4. Enter a custom delivery network
+  5. Run sample network with your own GA settings
+  6. Exit
+Select an option (1-6): 
+==================================================================
+ Extended Delivery Network
+==================================================================
+
+Available locations:
+  1. Depot
+  2. WarehouseA
+  3. WarehouseB
+  4. CityCenter
+  5. Suburb
+  6. Mall
+  7. University
+  8. Hospital
+  9. Airport
+  10. Harbour
+
+Enter the DEPOT (starting location): 
+Enter delivery stops separated by spaces, or ALL for every location.
+Delivery stops: 
+Shortest road distance between locations (km, from Dijkstra):
+----------------------------------------------------------------------------------------------------------------
+                 Depot Warehouse Warehouse CityCente    Suburb      Mall Universit  Hospital   Airport   Harbour
+Depot                0         4         8         7        11        12        13        16        21        23
+WarehouseA           4         0         5         3         7         8         9        12        17        19
+WarehouseB           8         5         0         2         6         7         8        11        16        18
+CityCenter           7         3         2         0         4         5         6         9        14        16
+Suburb              11         7         6         4         0         6         8         5        15        12
+Mall                12         8         7         5         6         0        11        11         9        13
+University          13         9         8         6         8        11         0         3         8        10
+Hospital            16        12        11         9         5        11         3         0        11         7
+Airport             21        17        16        14        15         9         8        11         0         4
+Harbour             23        19        18        16        12        13        10         7         4         0
+----------------------------------------------------------------------------------------------------------------
+
+Delivery stops  : 9
+Possible tours  : 20160 distinct orders
+GA settings     : population=60, generations=200, mutation=0.3, seed=2103
+
+Generation 0: 60 random routes created. Fittest 5:
+------------------------------------------------------------------
+Route (delivery order)                          Distance   Fitness
+------------------------------------------------------------------
+WarehouseB Hospital Harbour Airport Unive...        66.0    0.0152
+WarehouseA Hospital CityCenter Mall Subur...        76.0    0.0132
+WarehouseA Hospital Harbour Airport Subur...        76.0    0.0132
+WarehouseB WarehouseA CityCenter Airport ...        80.0    0.0125
+Mall CityCenter Hospital Airport Harbour ...        81.0    0.0123
+------------------------------------------------------------------
+Fitness = 1 / distance, so a shorter route scores higher.
+
+Evolution progress
+------------------------------------------------------------------
+Generation     Best in Gen       Average     Best Ever
+------------------------------------------------------------------
+0                     66.0          99.8          66.0
+20                    56.0          60.6          56.0
+40                    56.0          62.7          56.0
+60                    56.0          58.9          56.0
+  (Converged: no improvement for 50 generations, stopped at generation 68.)
+
+BASELINE ROUTE (Nearest Neighbour, greedy)
+------------------------------------------------------------------
+Delivery order : Depot -> WarehouseA -> CityCenter -> WarehouseB -> Suburb -> Hospital -> University -> Airport -> Harbour -> Mall -> Depot
+
+Leg   From          To                km   Roads driven
+------------------------------------------------------------------
+1     Depot         WarehouseA         4   Depot > WarehouseA
+2     WarehouseA    CityCenter         3   WarehouseA > CityCenter
+3     CityCenter    WarehouseB         2   CityCenter > WarehouseB
+4     WarehouseB    Suburb             6   WarehouseB > CityCenter > Suburb
+5     Suburb        Hospital           5   Suburb > Hospital
+6     Hospital      University         3   Hospital > University
+7     University    Airport            8   University > Airport
+8     Airport       Harbour            4   Airport > Harbour
+9     Harbour       Mall              13   Harbour > Airport > Mall
+10    Mall          Depot             12   Mall > CityCenter > WarehouseA > Depot
+------------------------------------------------------------------
+TOTAL DISTANCE : 60 km
+
+FINAL DELIVERY ROUTE (Genetic Algorithm)
+------------------------------------------------------------------
+Delivery order : Depot -> WarehouseA -> CityCenter -> Suburb -> Mall -> Airport -> Harbour -> Hospital -> University -> WarehouseB -> Depot
+
+Leg   From          To                km   Roads driven
+------------------------------------------------------------------
+1     Depot         WarehouseA         4   Depot > WarehouseA
+2     WarehouseA    CityCenter         3   WarehouseA > CityCenter
+3     CityCenter    Suburb             4   CityCenter > Suburb
+4     Suburb        Mall               6   Suburb > Mall
+5     Mall          Airport            9   Mall > Airport
+6     Airport       Harbour            4   Airport > Harbour
+7     Harbour       Hospital           7   Harbour > Hospital
+8     Hospital      University         3   Hospital > University
+9     University    WarehouseB         8   University > CityCenter > WarehouseB
+10    WarehouseB    Depot              8   WarehouseB > Depot
+------------------------------------------------------------------
+TOTAL DISTANCE : 56 km
+
+Solution quality comparison
+------------------------------------------------------------------
+Method                                  Distance    Routes checked
+------------------------------------------------------------------
+Nearest Neighbour (greedy)                  60.0                 1
+Genetic Algorithm (heuristic)               56.0              4140
+Brute force (true optimal)                  56.0             40320
+------------------------------------------------------------------
+The GA route is 6.7% shorter than the greedy baseline.
+Verification   : the GA found the TRUE OPTIMAL tour.
+
+Generations completed : 68
+
+Menu:
+  1. Run built-in sample delivery network
+  2. Run extended delivery network (larger search space)
+  3. Run built-in DISCONNECTED network (edge case test)
+  4. Enter a custom delivery network
+  5. Run sample network with your own GA settings
+  6. Exit
+Select an option (1-6): Exiting program.
+
+### TEST CASE 3 - Edge case: disconnected network (IsolatedZone unreachable)
+### Input: 3 / Depot / ALL / 6
+--------------------------------------------------------------------------
+==================================================================
+ CSC2103 Problem 3: Heuristic Algorithm
+ Smart Delivery Route Optimization System
+ Travelling Salesman Problem using a Genetic Algorithm
+==================================================================
+
+Menu:
+  1. Run built-in sample delivery network
+  2. Run extended delivery network (larger search space)
+  3. Run built-in DISCONNECTED network (edge case test)
+  4. Enter a custom delivery network
+  5. Run sample network with your own GA settings
+  6. Exit
+Select an option (1-6): 
+==================================================================
+ Disconnected Network (Edge Case)
+==================================================================
+
+Available locations:
+  1. Depot
+  2. WarehouseA
+  3. IsolatedZone
+
+Enter the DEPOT (starting location): 
+Enter delivery stops separated by spaces, or ALL for every location.
+Delivery stops: 
+No route exists between 'Depot' and 'IsolatedZone'.
+These locations are not connected by any road, so a delivery tour
+covering the selected stops is impossible.
+
+Menu:
+  1. Run built-in sample delivery network
+  2. Run extended delivery network (larger search space)
+  3. Run built-in DISCONNECTED network (edge case test)
+  4. Enter a custom delivery network
+  5. Run sample network with your own GA settings
+  6. Exit
+Select an option (1-6): Exiting program.
+
+### TEST CASE 4 - Edge case: only two delivery stops (no search needed)
+### Input: 1 / Depot / Mall Suburb / 6
+--------------------------------------------------------------------------
+==================================================================
+ CSC2103 Problem 3: Heuristic Algorithm
+ Smart Delivery Route Optimization System
+ Travelling Salesman Problem using a Genetic Algorithm
+==================================================================
+
+Menu:
+  1. Run built-in sample delivery network
+  2. Run extended delivery network (larger search space)
+  3. Run built-in DISCONNECTED network (edge case test)
+  4. Enter a custom delivery network
+  5. Run sample network with your own GA settings
+  6. Exit
+Select an option (1-6): 
+==================================================================
+ Sample Delivery Network
+==================================================================
+
+Available locations:
+  1. Depot
+  2. WarehouseA
+  3. WarehouseB
+  4. CityCenter
+  5. Suburb
+  6. Mall
+
+Enter the DEPOT (starting location): 
+Enter delivery stops separated by spaces, or ALL for every location.
+Delivery stops: 
+Shortest road distance between locations (km, from Dijkstra):
+------------------------------------------
+                 Depot      Mall    Suburb
+Depot                0        12        11
+Mall                12         0         6
+Suburb              11         6         0
+------------------------------------------
+
+Only 2 delivery stop(s), so one tour is possible and no search is needed.
+
+FINAL DELIVERY ROUTE
+------------------------------------------------------------------
+Delivery order : Depot -> Mall -> Suburb -> Depot
+
+Leg   From          To                km   Roads driven
+------------------------------------------------------------------
+1     Depot         Mall              12   Depot > WarehouseA > CityCenter > Mall
+2     Mall          Suburb             6   Mall > Suburb
+3     Suburb        Depot             11   Suburb > CityCenter > WarehouseA > Depot
+------------------------------------------------------------------
+TOTAL DISTANCE : 29 km
+
+Menu:
+  1. Run built-in sample delivery network
+  2. Run extended delivery network (larger search space)
+  3. Run built-in DISCONNECTED network (edge case test)
+  4. Enter a custom delivery network
+  5. Run sample network with your own GA settings
+  6. Exit
+Select an option (1-6): Exiting program.
+
+### TEST CASE 5 - Custom network entered by the user
+### Input: 4 / 5 locations / 6 roads / Depot / ALL / 6
+--------------------------------------------------------------------------
+==================================================================
+ CSC2103 Problem 3: Heuristic Algorithm
+ Smart Delivery Route Optimization System
+ Travelling Salesman Problem using a Genetic Algorithm
+==================================================================
+
+Menu:
+  1. Run built-in sample delivery network
+  2. Run extended delivery network (larger search space)
+  3. Run built-in DISCONNECTED network (edge case test)
+  4. Enter a custom delivery network
+  5. Run sample network with your own GA settings
+  6. Exit
+Select an option (1-6): 
+Number of locations (including the depot): Enter the name of each location (e.g. Depot, WarehouseA, Mall):
+  Location 1 name:   Location 2 name:   Location 3 name:   Location 4 name:   Location 5 name: 
+Number of roads connecting these locations: 
+For each road, enter: FromLocation ToLocation Distance
+Example: Depot WarehouseA 4
+
+  Road 1:   Road 2:   Road 3:   Road 4:   Road 5:   Road 6: 
+==================================================================
+ Custom Delivery Network
+==================================================================
+
+Available locations:
+  1. Depot
+  2. ZoneA
+  3. ZoneB
+  4. ZoneC
+  5. ZoneD
+
+Enter the DEPOT (starting location): 
+Enter delivery stops separated by spaces, or ALL for every location.
+Delivery stops: 
+Shortest road distance between locations (km, from Dijkstra):
+--------------------------------------------------------------
+                 Depot     ZoneA     ZoneB     ZoneC     ZoneD
+Depot                0       3.0       7.0       7.0      12.0
+ZoneA              3.0         0       6.0       4.0       9.0
+ZoneB              7.0       6.0         0       2.0       6.0
+ZoneC              7.0       4.0       2.0         0       5.0
+ZoneD             12.0       9.0       6.0       5.0         0
+--------------------------------------------------------------
+
+Delivery stops  : 4
+Possible tours  : 3 distinct orders
+GA settings     : population=60, generations=200, mutation=0.3, seed=2103
+
+Generation 0: 60 random routes created. Fittest 5:
+------------------------------------------------------------------
+Route (delivery order)                          Distance   Fitness
+------------------------------------------------------------------
+ZoneB ZoneD ZoneC ZoneA                             25.0    0.0400
+ZoneB ZoneD ZoneC ZoneA                             25.0    0.0400
+ZoneB ZoneD ZoneC ZoneA                             25.0    0.0400
+ZoneA ZoneC ZoneD ZoneB                             25.0    0.0400
+ZoneA ZoneC ZoneD ZoneB                             25.0    0.0400
+------------------------------------------------------------------
+Fitness = 1 / distance, so a shorter route scores higher.
+
+Evolution progress
+------------------------------------------------------------------
+Generation     Best in Gen       Average     Best Ever
+------------------------------------------------------------------
+0                     25.0          31.0          25.0
+20                    25.0          26.0          25.0
+40                    25.0          25.9          25.0
+  (Converged: no improvement for 50 generations, stopped at generation 50.)
+
+BASELINE ROUTE (Nearest Neighbour, greedy)
+------------------------------------------------------------------
+Delivery order : Depot -> ZoneA -> ZoneC -> ZoneB -> ZoneD -> Depot
+
+Leg   From          To                km   Roads driven
+------------------------------------------------------------------
+1     Depot         ZoneA            3.0   Depot > ZoneA
+2     ZoneA         ZoneC            4.0   ZoneA > ZoneC
+3     ZoneC         ZoneB            2.0   ZoneC > ZoneB
+4     ZoneB         ZoneD            6.0   ZoneB > ZoneD
+5     ZoneD         Depot           12.0   ZoneD > ZoneC > ZoneA > Depot
+------------------------------------------------------------------
+TOTAL DISTANCE : 27.0 km
+
+FINAL DELIVERY ROUTE (Genetic Algorithm)
+------------------------------------------------------------------
+Delivery order : Depot -> ZoneB -> ZoneD -> ZoneC -> ZoneA -> Depot
+
+Leg   From          To                km   Roads driven
+------------------------------------------------------------------
+1     Depot         ZoneB            7.0   Depot > ZoneB
+2     ZoneB         ZoneD            6.0   ZoneB > ZoneD
+3     ZoneD         ZoneC            5.0   ZoneD > ZoneC
+4     ZoneC         ZoneA            4.0   ZoneC > ZoneA
+5     ZoneA         Depot            3.0   ZoneA > Depot
+------------------------------------------------------------------
+TOTAL DISTANCE : 25.0 km
+
+Solution quality comparison
+------------------------------------------------------------------
+Method                                  Distance    Routes checked
+------------------------------------------------------------------
+Nearest Neighbour (greedy)                  27.0                 1
+Genetic Algorithm (heuristic)               25.0              3060
+Brute force (true optimal)                  25.0                 6
+------------------------------------------------------------------
+The GA route is 7.4% shorter than the greedy baseline.
+Verification   : the GA found the TRUE OPTIMAL tour.
+
+Generations completed : 50
+
+Menu:
+  1. Run built-in sample delivery network
+  2. Run extended delivery network (larger search space)
+  3. Run built-in DISCONNECTED network (edge case test)
+  4. Enter a custom delivery network
+  5. Run sample network with your own GA settings
+  6. Exit
+Select an option (1-6): Exiting program.
+
+### TEST CASE 6 - Custom GA settings (population 20, 30 generations, mutation 0.5)
+### Input: 5 / 20 / 30 / 0.5 / defaults / Depot / ALL / 6
+--------------------------------------------------------------------------
+==================================================================
+ CSC2103 Problem 3: Heuristic Algorithm
+ Smart Delivery Route Optimization System
+ Travelling Salesman Problem using a Genetic Algorithm
+==================================================================
+
+Menu:
+  1. Run built-in sample delivery network
+  2. Run extended delivery network (larger search space)
+  3. Run built-in DISCONNECTED network (edge case test)
+  4. Enter a custom delivery network
+  5. Run sample network with your own GA settings
+  6. Exit
+Select an option (1-6): 
+GA parameters (press Enter to keep the default):
+  Population size [60]:   Generations [200]:   Mutation rate (0.0 - 1.0) [0.3]:   Tournament size [4]:   Elite routes kept [2]:   Random seed [2103]: 
+==================================================================
+ Sample Delivery Network (Custom GA Settings)
+==================================================================
+
+Available locations:
+  1. Depot
+  2. WarehouseA
+  3. WarehouseB
+  4. CityCenter
+  5. Suburb
+  6. Mall
+
+Enter the DEPOT (starting location): 
+Enter delivery stops separated by spaces, or ALL for every location.
+Delivery stops: 
+Shortest road distance between locations (km, from Dijkstra):
+------------------------------------------------------------------------
+                 Depot Warehouse Warehouse CityCente    Suburb      Mall
+Depot                0         4         8         7        11        12
+WarehouseA           4         0         5         3         7         8
+WarehouseB           8         5         0         2         6         7
+CityCenter           7         3         2         0         4         5
+Suburb              11         7         6         4         0         6
+Mall                12         8         7         5         6         0
+------------------------------------------------------------------------
+
+Delivery stops  : 5
+Possible tours  : 12 distinct orders
+GA settings     : population=20, generations=30, mutation=0.5, seed=2103
+
+Generation 0: 20 random routes created. Fittest 5:
+------------------------------------------------------------------
+Route (delivery order)                          Distance   Fitness
+------------------------------------------------------------------
+WarehouseB Mall Suburb CityCenter WarehouseA        32.0    0.0312
+WarehouseA CityCenter Mall Suburb WarehouseB        32.0    0.0312
+CityCenter WarehouseB Suburb Mall WarehouseA        33.0    0.0303
+CityCenter WarehouseB Mall Suburb WarehouseA        33.0    0.0303
+WarehouseA Mall CityCenter Suburb WarehouseB        35.0    0.0286
+------------------------------------------------------------------
+Fitness = 1 / distance, so a shorter route scores higher.
+
+Evolution progress
+------------------------------------------------------------------
+Generation     Best in Gen       Average     Best Ever
+------------------------------------------------------------------
+0                     32.0          37.9          32.0
+3                     32.0          32.8          32.0
+6                     32.0          33.0          32.0
+9                     32.0          33.5          32.0
+12                    32.0          33.9          32.0
+15                    32.0          32.8          32.0
+18                    32.0          33.9          32.0
+21                    32.0          34.4          32.0
+24                    32.0          34.0          32.0
+27                    32.0          34.5          32.0
+30                    32.0          34.1          32.0
+
+BASELINE ROUTE (Nearest Neighbour, greedy)
+------------------------------------------------------------------
+Delivery order : Depot -> WarehouseA -> CityCenter -> WarehouseB -> Suburb -> Mall -> Depot
+
+Leg   From          To                km   Roads driven
+------------------------------------------------------------------
+1     Depot         WarehouseA         4   Depot > WarehouseA
+2     WarehouseA    CityCenter         3   WarehouseA > CityCenter
+3     CityCenter    WarehouseB         2   CityCenter > WarehouseB
+4     WarehouseB    Suburb             6   WarehouseB > CityCenter > Suburb
+5     Suburb        Mall               6   Suburb > Mall
+6     Mall          Depot             12   Mall > CityCenter > WarehouseA > Depot
+------------------------------------------------------------------
+TOTAL DISTANCE : 33 km
+
+FINAL DELIVERY ROUTE (Genetic Algorithm)
+------------------------------------------------------------------
+Delivery order : Depot -> WarehouseB -> Mall -> Suburb -> CityCenter -> WarehouseA -> Depot
+
+Leg   From          To                km   Roads driven
+------------------------------------------------------------------
+1     Depot         WarehouseB         8   Depot > WarehouseB
+2     WarehouseB    Mall               7   WarehouseB > CityCenter > Mall
+3     Mall          Suburb             6   Mall > Suburb
+4     Suburb        CityCenter         4   Suburb > CityCenter
+5     CityCenter    WarehouseA         3   CityCenter > WarehouseA
+6     WarehouseA    Depot              4   WarehouseA > Depot
+------------------------------------------------------------------
+TOTAL DISTANCE : 32 km
+
+Solution quality comparison
+------------------------------------------------------------------
+Method                                  Distance    Routes checked
+------------------------------------------------------------------
+Nearest Neighbour (greedy)                  33.0                 1
+Genetic Algorithm (heuristic)               32.0               620
+Brute force (true optimal)                  32.0                24
+------------------------------------------------------------------
+The GA route is 3.0% shorter than the greedy baseline.
+Verification   : the GA found the TRUE OPTIMAL tour.
+
+Generations completed : 30
+
+Menu:
+  1. Run built-in sample delivery network
+  2. Run extended delivery network (larger search space)
+  3. Run built-in DISCONNECTED network (edge case test)
+  4. Enter a custom delivery network
+  5. Run sample network with your own GA settings
+  6. Exit
+Select an option (1-6): Exiting program.
+
+### TEST CASE 7 - Input validation (bad menu option, bad location count,
+###   malformed road, unknown location, negative distance, unknown depot,
+###   depot chosen as a delivery stop)
+--------------------------------------------------------------------------
+==================================================================
+ CSC2103 Problem 3: Heuristic Algorithm
+ Smart Delivery Route Optimization System
+ Travelling Salesman Problem using a Genetic Algorithm
+==================================================================
+
+Menu:
+  1. Run built-in sample delivery network
+  2. Run extended delivery network (larger search space)
+  3. Run built-in DISCONNECTED network (edge case test)
+  4. Enter a custom delivery network
+  5. Run sample network with your own GA settings
+  6. Exit
+Select an option (1-6): Invalid option, please enter 1, 2, 3, 4, 5 or 6.
+
+Menu:
+  1. Run built-in sample delivery network
+  2. Run extended delivery network (larger search space)
+  3. Run built-in DISCONNECTED network (edge case test)
+  4. Enter a custom delivery network
+  5. Run sample network with your own GA settings
+  6. Exit
+Select an option (1-6): 
+Number of locations (including the depot):     Value must be between 2 and 50.
+
+Number of locations (including the depot): Enter the name of each location (e.g. Depot, WarehouseA, Mall):
+  Location 1 name:   Location 2 name:   Location 3 name: 
+Number of roads connecting these locations: 
+For each road, enter: FromLocation ToLocation Distance
+Example: Depot WarehouseA 4
+
+  Road 1:     Please enter exactly 3 values: From To Distance.
+  Road 1:     One of those locations was not registered above. Try again.
+  Road 1:     Distance cannot be negative. Try again.
+  Road 1:   Road 2: 
+==================================================================
+ Custom Delivery Network
+==================================================================
+
+Available locations:
+  1. Depot
+  2. ZoneA
+  3. ZoneB
+
+Enter the DEPOT (starting location):     That location does not exist in the network. Try again.
+
+Enter the DEPOT (starting location): 
+Enter delivery stops separated by spaces, or ALL for every location.
+Delivery stops:     The depot cannot also be a delivery stop. Try again.
+Delivery stops: 
+Shortest road distance between locations (km, from Dijkstra):
+------------------------------------------
+                 Depot     ZoneA     ZoneB
+Depot                0       3.0       7.0
+ZoneA              3.0         0       4.0
+ZoneB              7.0       4.0         0
+------------------------------------------
+
+Only 2 delivery stop(s), so one tour is possible and no search is needed.
+
+FINAL DELIVERY ROUTE
+------------------------------------------------------------------
+Delivery order : Depot -> ZoneA -> ZoneB -> Depot
+
+Leg   From          To                km   Roads driven
+------------------------------------------------------------------
+1     Depot         ZoneA            3.0   Depot > ZoneA
+2     ZoneA         ZoneB            4.0   ZoneA > ZoneB
+3     ZoneB         Depot            7.0   ZoneB > ZoneA > Depot
+------------------------------------------------------------------
+TOTAL DISTANCE : 14.0 km
+
+Menu:
+  1. Run built-in sample delivery network
+  2. Run extended delivery network (larger search space)
+  3. Run built-in DISCONNECTED network (edge case test)
+  4. Enter a custom delivery network
+  5. Run sample network with your own GA settings
+  6. Exit
+Select an option (1-6): Exiting program.
